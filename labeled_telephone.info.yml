@@ -1,0 +1,10 @@
+name: Telephone (labeled)
+type: module
+description: 'Defines a field type for telephone numbers, with a label.'
+package: Field types
+version: 1.0
+core: 8.x
+
+dependencies:
+  - field
+  - telephone
