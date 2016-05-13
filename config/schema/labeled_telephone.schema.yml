@@ -1,0 +1,2 @@
+field.formatter.settings.labeled_telephone_link:
+  type: field.formatter.settings.telephone_link
