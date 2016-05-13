@@ -45,7 +45,7 @@ class LabeledTelephoneDefaultWidget extends TelephoneDefaultWidget {
       '#required' => FALSE,
       '#weight' => 2,
     );
-kint($element);
+
     return $element;
   }
 }

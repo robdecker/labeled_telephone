@@ -51,8 +51,8 @@ class LabeledTelephoneItem extends TelephoneItem {
    */
   public function isEmpty() {
     $parent = parent::isEmpty();
-    $value2 = $this->get('label')->getValue();
-    return $parent && empty($value2);
+    $value = $this->get('label')->getValue();
+    return $parent && empty($value);
   }
 
 }

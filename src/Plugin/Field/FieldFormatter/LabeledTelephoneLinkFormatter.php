@@ -36,6 +36,8 @@ class LabeledTelephoneLinkFormatter extends TelephoneLinkFormatter {
         // Prepend 'tel:' to the telephone number.
         '#url' => Url::fromUri('tel:' . rawurlencode(preg_replace('/\s+/', '', $item->value))),
         '#options' => array('external' => TRUE),
+        '#prefix' => '<span class="labeled-telephone__telephone">',
+        '#suffix' => '</span>',
       );
 
       if (!empty($item->_attributes)) {
@@ -48,14 +50,14 @@ class LabeledTelephoneLinkFormatter extends TelephoneLinkFormatter {
 
       $elements[$delta][1] = array(
         '#type' => 'markup',
-        '#prefix' => '<span class="separator">',
+        '#prefix' => '<span class="labeled-telephone__separator">',
         '#suffix' => '</span>',
         '#markup' => ' - ',
       );
 
       $elements[$delta][2] = array(
         '#type' => 'markup',
-        '#prefix' => '<span class="rate">',
+        '#prefix' => '<span class="labeled-telephone__label">',
         '#suffix' => '</span>',
         '#markup' => $item->label,
       );
