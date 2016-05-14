@@ -3,8 +3,9 @@
 namespace Drupal\labeled_telephone\Plugin\Field\FieldFormatter;
 
 use Drupal\Core\Field\FieldItemListInterface;
-use Drupal\telephone\Plugin\Field\FieldFormatter\TelephoneLinkFormatter;
+use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Url;
+use Drupal\telephone\Plugin\Field\FieldFormatter\TelephoneLinkFormatter;
 
 /**
  * Plugin implementation of the 'labeled_telephone_link' formatter.
@@ -18,6 +19,47 @@ use Drupal\Core\Url;
  * )
  */
 class LabeledTelephoneLinkFormatter extends TelephoneLinkFormatter {
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function defaultSettings() {
+    return array(
+      'separator' => '',
+    ) + parent::defaultSettings();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function settingsForm(array $form, FormStateInterface $form_state) {
+    $elements = parent::settingsForm($form, $form_state);
+
+    $elements['separator'] = array(
+      '#type' => 'textfield',
+      '#title' => t('Character(s) to use in between the telephone link and the label'),
+      '#default_value' => $this->getSetting('separator'),
+    );
+
+    return $elements;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function settingsSummary() {
+    $summary = parent::settingsSummary();
+    $settings = $this->getSettings();
+
+    if (!empty($settings['separator'])) {
+      $summary[] = t('Separator using character(s): @separator', array('@separator' => $settings['separator']));
+    }
+    else {
+      $summary[] = t('No separator sprecified');
+    }
+
+    return $summary;
+  }
 
   /**
    * {@inheritdoc}
@@ -52,7 +94,7 @@ class LabeledTelephoneLinkFormatter extends TelephoneLinkFormatter {
         '#type' => 'markup',
         '#prefix' => '<span class="labeled-telephone__separator">',
         '#suffix' => '</span>',
-        '#markup' => ' - ',
+        '#markup' => $this->getSetting('separator'),
       );
 
       $elements[$delta][2] = array(
