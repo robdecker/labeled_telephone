@@ -2,8 +2,11 @@ field.formatter.settings.labeled_telephone_link:
   type: field.formatter.settings.telephone_link
   mapping:
     separator:
-      type: label
+      type: string
       label: 'Character(s) to use in between the telephone link and the label'
+    order:
+      type: string
+      label: 'The rendering order of the telephone link and the label'
 
 field.widget.settings.labeled_telephone_default:
   type: field.widget.settings.telephone_default

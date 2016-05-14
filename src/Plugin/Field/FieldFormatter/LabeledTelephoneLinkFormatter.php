@@ -25,7 +25,8 @@ class LabeledTelephoneLinkFormatter extends TelephoneLinkFormatter {
    */
   public static function defaultSettings() {
     return array(
-      'separator' => '',
+      'separator' => ': ',
+      'order' => 'telephone_first',
     ) + parent::defaultSettings();
   }
 
@@ -41,6 +42,13 @@ class LabeledTelephoneLinkFormatter extends TelephoneLinkFormatter {
       '#default_value' => $this->getSetting('separator'),
     );
 
+    $elements['order'] = array(
+      '#type' => 'select',
+      '#title' => t('The rendering order of the telephone link and the label'),
+      '#options' => $this->getOrderOptions(),
+      '#default_value' => $this->getSetting('order'),
+    );
+
     return $elements;
   }
 
@@ -50,13 +58,16 @@ class LabeledTelephoneLinkFormatter extends TelephoneLinkFormatter {
   public function settingsSummary() {
     $summary = parent::settingsSummary();
     $settings = $this->getSettings();
+    $options = $this->getOrderOptions();
 
     if (!empty($settings['separator'])) {
       $summary[] = t('Separator using character(s): @separator', array('@separator' => $settings['separator']));
     }
     else {
-      $summary[] = t('No separator sprecified');
+      $summary[] = t('No separator specified');
     }
+
+    $summary[] = t('Order: @order', array('@order' => $options[$this->getSetting('order')]));
 
     return $summary;
   }
@@ -68,19 +79,38 @@ class LabeledTelephoneLinkFormatter extends TelephoneLinkFormatter {
     $elements = array();
     $title_setting = $this->getSetting('title');
 
+    // Render each element as link.
+    $telephone = array(
+      '#type' => 'link',
+      '#title' => '',
+      '#url' => '',
+      '#options' => array('external' => TRUE),
+      '#prefix' => '<span class="labeled-telephone__telephone">',
+      '#suffix' => '</span>',
+    );
+
+    $label = array(
+      '#type' => 'markup',
+      '#prefix' => '<span class="labeled-telephone__label">',
+      '#suffix' => '</span>',
+      '#markup' => '',
+    );
+
+    $separator = array(
+      '#type' => 'markup',
+      '#prefix' => '<span class="labeled-telephone__separator">',
+      '#suffix' => '</span>',
+      '#markup' => $this->getSetting('separator'),
+    );
+
     foreach ($items as $delta => $item) {
-      // Render each element as link.
-      $elements[$delta][0] = array(
-        '#type' => 'link',
-        // Use custom title if available, otherwise use the telephone number
-        // itself as title.
-        '#title' => $title_setting ?: $item->value,
-        // Prepend 'tel:' to the telephone number.
-        '#url' => Url::fromUri('tel:' . rawurlencode(preg_replace('/\s+/', '', $item->value))),
-        '#options' => array('external' => TRUE),
-        '#prefix' => '<span class="labeled-telephone__telephone">',
-        '#suffix' => '</span>',
-      );
+      // Use custom title if available, otherwise use the telephone number
+      // itself as title.
+      $telephone['#title'] = $title_setting ?: $item->value;
+      // Prepend 'tel:' to the telephone number.
+      $telephone['#url'] = Url::fromUri('tel:' . rawurlencode(preg_replace('/\s+/', '', $item->value)));
+
+      $label['#markup'] = $item->label;
 
       if (!empty($item->_attributes)) {
         $elements[$delta]['#options'] += array('attributes' => array());
@@ -90,22 +120,38 @@ class LabeledTelephoneLinkFormatter extends TelephoneLinkFormatter {
         unset($item->_attributes);
       }
 
-      $elements[$delta][1] = array(
-        '#type' => 'markup',
-        '#prefix' => '<span class="labeled-telephone__separator">',
-        '#suffix' => '</span>',
-        '#markup' => $this->getSetting('separator'),
-      );
+      switch ($this->getSetting('order')) {
+        case 'label_first':
+          $elements[$delta][0] = $label;
+          $elements[$delta][1] = $separator;
+          $elements[$delta][2] = $telephone;
+          break;
 
-      $elements[$delta][2] = array(
-        '#type' => 'markup',
-        '#prefix' => '<span class="labeled-telephone__label">',
-        '#suffix' => '</span>',
-        '#markup' => $item->label,
-      );
+        case 'telephone_first':
+        default:
+          $elements[$delta][0] = $telephone;
+          $elements[$delta][1] = $separator;
+          $elements[$delta][2] = $label;
+          break;
+      }
     }
 
     return $elements;
+  }
+
+  /**
+   * Gets all possible sub-field ordering options.
+   *
+   * @return array
+   *   The array of options.
+   */
+  protected function getOrderOptions() {
+    $options = array(
+      'telephone_first' => 'Telephone first, label second',
+      'label_first' => 'Label first, telephone second',
+    );
+
+    return $options;
   }
 
 }
