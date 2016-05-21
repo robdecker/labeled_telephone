@@ -15,7 +15,7 @@ use Drupal\telephone\Plugin\Field\FieldType\TelephoneItem;
  *   description = @Translation("Stores a phone and label."),
  *   category = @Translation("Number"),
  *   default_widget = "labeled_telephone_default",
- *   default_formatter = "labeled_telephone_link"
+ *   default_formatter = "labeled_telephone_default"
  * )
  */
 class LabeledTelephoneItem extends TelephoneItem {
